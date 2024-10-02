@@ -12,8 +12,8 @@
 
 ### Open Questions:
 1. Is it somehow related to Fourier series and sin and cos defined on the circle. 
-2. Why are we using 10000 as the base for the power of the sinusoidal function?
-3. Why are we using the power of 2*i/d_model?
+2. Why are we using $10000$ as the base for the power of the sinusoidal function?
+3. Why are we using the power of $(\frac{2*i}{d_{model}})$?
 4. Is there any better positional encoding method? How much does this positional encoding affect the model?
 
 
