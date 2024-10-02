@@ -25,6 +25,7 @@ class Encoder:
         
 
 def position_embedding(sent: Tensor, d_model: int) -> Tensor:
+    
     '''
     We will require the position embedding to be unique for each word in the sentence. 
     As it represents different position and having the same position will affect the learning of the model.
@@ -44,12 +45,15 @@ def position_embedding(sent: Tensor, d_model: int) -> Tensor:
     sent: Tensor - The sentence converted into embeddings that will be passed into the encoder.
     d_model: int - The dimension of the model.
     '''
+    
     pe = np.zeros((sent.size()[0], d_model))
+    
     for pos, word in enumerate(sent.size()[0]):
         for i in range(0,d_model, 2):
             pe[pos][i] = math.sin(pos/(10000**(2*i/d_model)))
             pe[pos][i+1] = math.cos(pos/(10000**(2*i/d_model)))
 
+    # adding positional encoding to the sentence, that will be passed into the transformer (encoder/decoder).
     final_sent = sent + pe
     return final_sent
 
