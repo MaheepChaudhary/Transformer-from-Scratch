@@ -22,24 +22,28 @@ class Transformer(nn.Module):
         
         self.sent = sent
         self.num_heads = num_heads
-        self.input_emebdding = position_embedding(self.sent, 4)
-
-        def Encoder(self):
-
-        def __init__(self,
-                    num_heads: int,
-                    sent: Tensor) -> None:
-            
-            self.sent = sent
-            self.num_heads = num_heads
-            self.input_emebdding = position_embedding(self.sent, 4)    
-
+        self.input_emebdding = self.position_embedding(self.sent, 4)
+    
+    def encoder(self):
         # we will make two heads for multi-head attention
         def self_attention(self):
             '''
             We are making this function for just 1 sample. 
             The words of which will be computed to have similarity with each other.
             '''
+            
+            W_q = t.randn((512, 1024))
+            W_k = t.randn((512, 1024))
+            W_v = t.randn((512, 1024))
+
+            '''
+            The query, key and value are made such that the embedding dimension is eliminated
+            '''
+
+            query_list = t.matmul(self.sent, W_q.T)
+            key = t.matmul(self.sent, W_k.T)
+            value_list = t.matmul(self.sent, W_v.T) 
+            
             for pos in range(self.sent.size()[0]):
                 query = self.sent[pos]
                 key = self.sent
@@ -50,10 +54,8 @@ class Transformer(nn.Module):
                 product_similarity = t.softmax(similarity, dim = 0)/t.sqrt(t.tensor(self.sent.size()[0]))
                 values = t.matmul(product_similarity, value)
             
-            
-            
 
-        def position_embedding(sent: Tensor, d_model: int) -> Tensor:
+        def position_embedding(self, sent: Tensor, d_model: int) -> Tensor:
 
             '''
             We will require the position embedding to be unique for each word in the sentence. 
@@ -84,4 +86,4 @@ class Transformer(nn.Module):
 
             # adding positional encoding to the sentence, that will be passed into the transformer (encoder/decoder).
             final_sent = sent + pe
-            return final_sent
+            return t.tensor(final_sent)
