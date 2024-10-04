@@ -37,23 +37,14 @@ class Transformer(nn.Module):
             W_v = t.randn((512, 1024))
 
             '''
-            The query, key and value are made such that the embedding dimension is eliminated
+            The query, key, and value are the three vectors that are used to computed with the embedding layer dim to assign a new dim.
             '''
 
-            query_list = t.matmul(self.sent, W_q.T)
-            key = t.matmul(self.sent, W_k.T)
-            value_list = t.matmul(self.sent, W_v.T) 
+            query_list = t.matmul(self.input_embeddings, W_q) # (4, 512) * (512, 1024) = (4, 1024)
+            key = t.matmul(self.input_embeddings, W_k)        # (4, 512) * (512, 1024) = (4, 1024) 
+            value_list = t.matmul(self.embeddings, W_v)       # (4, 512) * (512, 1024) = (4, 1024)
             
-            for pos in range(self.sent.size()[0]):
-                query = self.sent[pos]
-                key = self.sent
-                value = self.sent[pos]
-                
-                # computing the dot product of query and key
-                similarity = t.dot(query, key)
-                product_similarity = t.softmax(similarity, dim = 0)/t.sqrt(t.tensor(self.sent.size()[0]))
-                values = t.matmul(product_similarity, value)
-            
+            product = t.softmax(t.matmul(query_list, key.T))  # (4, 1024) * (1024, 4) = (4, 4)
 
         def position_embedding(self, sent: Tensor, d_model: int) -> Tensor:
 
