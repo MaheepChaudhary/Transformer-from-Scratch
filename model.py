@@ -22,7 +22,7 @@ class Transformer(nn.Module):
         
         self.sent = sent
         self.num_heads = num_heads
-        self.input_emebdding = self.position_embedding(self.sent, 4)
+    
     
     def encoder(self):
         # we will make two heads for multi-head attention
@@ -32,20 +32,37 @@ class Transformer(nn.Module):
             The words of which will be computed to have similarity with each other.
             '''
             
-            W_q = t.randn((512, 1024))
-            W_k = t.randn((512, 1024))
-            W_v = t.randn((512, 1024))
+            W_q_1 = t.randn((512, 1024))
+            W_k_1 = t.randn((512, 1024))
+            W_v_1 = t.randn((512, 1024))
+            
+            W_q_2 = t.randn((512, 1024))
+            W_k_2 = t.randn((512, 1024))
+            W_v_2 = t.randn((512, 1024))
+
 
             '''
             The query, key, and value are the three vectors that are used to computed with the embedding layer dim to assign a new dim.
             '''
 
-            query_list = t.matmul(self.input_embeddings, W_q) # (4, 512) * (512, 1024) = (4, 1024)
-            key = t.matmul(self.input_embeddings, W_k)        # (4, 512) * (512, 1024) = (4, 1024) 
-            value_list = t.matmul(self.embeddings, W_v)       # (4, 512) * (512, 1024) = (4, 1024)
+            query1 = t.matmul(self.input_embeddings, W_q_1) # (4, 512) * (512, 1024) = (4, 1024)
+            key1 = t.matmul(self.input_embeddings, W_k_1)        # (4, 512) * (512, 1024) = (4, 1024) 
+            value1 = t.matmul(self.embeddings, W_v_1)       # (4, 512) * (512, 1024) = (4, 1024)
             
-            product = t.softmax(t.matmul(query_list, key.T))  # (4, 1024) * (1024, 4) = (4, 4)
+            product1 = t.softmax(t.matmul(query1, key1.T)/t.sqrt(key1.size()[0]))  # (4, 1024) * (1024, 4) = (4, 4)
+            attention1 = t.matmul(product1, value1)
+            
+            query2 = t.matmul(self.input_embeddings, W_q_2) # (4, 512) * (512, 1024) = (4, 1024)
+            key2 = t.matmul(self.input_embeddings, W_k_2)        # (4, 512) * (512, 1024) = (4, 1024) 
+            value2 = t.matmul(self.embeddings, W_v_2)
+        
+            product2 = t.softmax(t.matmul(query2, key2.T)/t.sqrt(key2.size()[0]))  # (4, 1024) * (1024, 4) = (4, 4)
+            attention2 = t.matmul(product2, value2)
 
+            overall_attention = t.concat(attention1, attention2)
+            
+            return overall_attention
+            
         def position_embedding(self, sent: Tensor, d_model: int) -> Tensor:
 
             '''
@@ -78,3 +95,7 @@ class Transformer(nn.Module):
             # adding positional encoding to the sentence, that will be passed into the transformer (encoder/decoder).
             final_sent = sent + pe
             return t.tensor(final_sent)
+
+        def forward(self):
+            self.input_emebdding = self.position_embedding(self.sent, 4)
+            multi_head_attn = self.self_attention()
