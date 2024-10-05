@@ -28,7 +28,12 @@ class Transformer(nn.Module):
         self.W_q_2 = nn.Linear(512, 1024)
         self.W_k_2 = nn.Linear(512, 1024)
         self.W_v_2 = nn.Linear(512, 1024)
-        self.W_o = nn.Linear(4,2048) 
+        self.W_o = nn.Linear(1024,1024) 
+        self.layer_norm = nn.LayerNorm(1024)
+        self.fc1 = nn.Linear(2048, 1024)
+        self.fc2 = nn.Linear(1024, 2048)
+        self.relu = nn.ReLU()
+
     
     def encoder(self):
         # we will make two heads for multi-head attention
@@ -41,7 +46,7 @@ class Transformer(nn.Module):
             '''
             The query, key, and value are the three vectors that are used to computed with the embedding layer dim to assign a new dim.
             '''
-
+            #TODO: Split tensors into multiple heads
             query1 = t.matmul(self.input_embeddings, self.W_q_1) # (4, 512) * (512, 1024) = (4, 1024)
             key1 = t.matmul(self.input_embeddings, self.W_k_1)        # (4, 512) * (512, 1024) = (4, 1024) 
             value1 = t.matmul(self.embeddings, self.W_v_1)       # (4, 512) * (512, 1024) = (4, 1024)
@@ -93,8 +98,18 @@ class Transformer(nn.Module):
             final_sent = sent + pe
             return t.tensor(final_sent)
 
+        def ffn(self, x:Tensor) -> Tensor:
+            x1 = self.fc1(x)
+            x2 = self.relu(x1)
+            x3 = self.fc2(x2)
+        
+            return x3
+
         def forward(self):
             self.input_embedding = self.position_embedding(self.sent, 4)
             multi_head_attn = self.self_attention()
-            multi_head_attn_out = t.matmul(multi_head_attn, self.W_o)
-            
+            multi_head_attn_out = t.matmul(multi_head_attn, self.W_o.T) #(4,2048) * (2048, 4) = (4, 4)
+            input_embedding = self.layernorm(multi_head_attn_out + self.input_embedding)
+            ffn_out = self.ffn(input_embedding)
+            encoder_out = self.layernorm(ffn_out + input_embedding)
+            return encoder_out
