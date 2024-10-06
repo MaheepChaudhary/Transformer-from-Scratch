@@ -27,7 +27,7 @@ class encoder:
         self.seq_len = sent.size()[0]
         assert self.seq_len == 4, "The sequence length should be 4."
         
-        self.W_o = nn.Linear(512,512) 
+        self.W_o = nn.Linear(512*self.num_heads,512) 
         
         self.layer_norm = nn.LayerNorm(512)
         
@@ -48,9 +48,9 @@ class encoder:
         The query, key, and value are the three vectors that are used to computed with the embedding layer dim to assign a new dim.
         '''
         
-        query = self.W_q(self.input_embedding).view(1, self.num_heads, self.seq_len, self.q_dim) # (1, 2, 4, 256)
-        key = self.W_k(self.input_embedding).view(1, self.num_heads, self.seq_len, self.k_dim) # (1, 2, 4, 256)
-        value = self.W_v(self.input_embedding).view(1, self.num_heads, self.seq_len, self.v_dim) # (1, 2, 4, 256)
+        query = self.W_q(self.input_embedding).view(1, self.num_heads, self.seq_len, self.q_dim) # (1, 2, 4, 512)
+        key = self.W_k(self.input_embedding).view(1, self.num_heads, self.seq_len, self.k_dim) # (1, 2, 4, 512)
+        value = self.W_v(self.input_embedding).view(1, self.num_heads, self.seq_len, self.v_dim) # (1, 2, 4, 512)
         
         # we will take the dot product of query and key to get the similarity score.
         attention_score = t.softmax(t.matmul(query, key.transpose(2,3))/t.sqrt(t.tensor(self.k_dim)), dim=-1) # (1, 2, 4, 4)
