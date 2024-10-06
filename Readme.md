@@ -1,7 +1,7 @@
 # 🤖🗒️ Transformer From Scratch:
 
 I will be implementing a 1 layer Transformer architecure with with no dropouts, custom optimisation and layers.
-The implementation is built by taking the ![https://jalammar.github.io/illustrated-transformer](Jay Alammar's Blog) as basis.
+The implementation is built by taking the [Jay Alammar's Blog](https://jalammar.github.io/illustrated-transformer) as basis.
 This repo will be aimed to provide insights to me and to other how really Transformers work, even at a gradient level.
 This will not only enable the users to build upon this repo but will also be able to do toy experiments; as we all are GPU poor 😛,
 There have been recent discoveries regarding the behaviour of transformers, i.e. do they learn or generalize?
@@ -11,7 +11,7 @@ This could also be used by others better understand Transformer.
 I would be excited to post open questions and their answers that i would encounter during this implementation (some of them posted below).
 I hope it would be useful resource for the community.
 
-I am constantly active on Twitter and can be found posting useful things i find during my learning journey: [https://x.com/ChaudharyMaheep](Twitter)
+I am constantly active on Twitter and can be found posting useful things i find during my learning journey: [Twitter](https://x.com/ChaudharyMaheep)
 
 ## 🧿 Positional Encoding:
 
@@ -32,5 +32,5 @@ I am constantly active on Twitter and can be found posting useful things i find 
 
 - [Transformer Architecture: The Positional Encoding by Amirhossein Kazemnejad's](https://kazemnejad.com/blog/transformer_architecture_positional_encoding/)
 
-Connect with me or to have an e-coffee 😉 on [https://x.com/ChaudharyMaheep](Twitter)
+Connect with me or to have an e-coffee 😉 on [Twitter](https://x.com/ChaudharyMaheep) 
 
