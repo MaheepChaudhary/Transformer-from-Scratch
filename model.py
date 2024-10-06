@@ -19,9 +19,14 @@ class encoder:
         as a result, 1024/2 = 512 for the output dim.
         The will become 1024 when it will be concatenated. 
         '''
-        self.W_q = nn.Linear(512, 512) 
-        self.W_k = nn.Linear(512, 512)
-        self.W_v = nn.Linear(512, 512)
+        self.k_dim = 512/num_heads; self.v_dim = 512/num_heads; self.q_dim = 512/num_heads        
+
+        self.W_q = nn.Linear(512, self.k_dim*self.num_heads) 
+        self.W_k = nn.Linear(512, self.k_dim*self.num_heads)
+        self.W_v = nn.Linear(512, self.v_dim*self.num_heads)
+
+        self.seq_len = sent.size()[0]
+        assert self.seq_len == 4, "The sequence length should be 4."
         
         self.W_o = nn.Linear(512,512) 
         
@@ -44,18 +49,19 @@ class encoder:
         The query, key, and value are the three vectors that are used to computed with the embedding layer dim to assign a new dim.
         '''
         
-        query = self.W_q(self.input_embedding) # (4, 512)
-        key = self.W_k(self.input_embedding) # (4, 512)
-        value = self.W_v(self.input_embedding)  # (4, 512)
+        query = self.W_q(self.input_embedding).view(1, self.num_heads, self.seq_len, self.q_dim) # (1, 2, 4, 256)
+        key = self.W_k(self.input_embedding).view(1, self.num_heads, self.seq_len, self.k_dim) # (1, 2, 4, 256)
+        value = self.W_v(self.input_embedding).view(1, self.num_heads, self.seq_len, self.v_dim) # (1, 2, 4, 256)
         
-        query = t.split(query, 2, dim=1)
-        key = t.split(key, 2, dim=1)
-        value = t.split(value, 2, dim=1)
+        # we will take the dot product of query and key to get the similarity score.
+        attention_score = t.softmax(t.matmul(query, key.transpose(2,3))/t.sqrt(t.tensor(self.k_dim)), dim=-1) # (1, 2, 4, 4)
+        overall_attention = t.matmul(attention_score, value)
+
+        overall_attention = t.cat(overall_attention).view(1, self.seq_len, self.k_dim*self.num_heads) # (1, 4, 512)
         
-        
-        
+        final_attention = self.W_o(overall_attention) # (1, 4, 512)
                 
-        return overall_attention
+        return final_attention
         
     def position_embedding(self, sent: Tensor, d_model: int) -> Tensor:
 
@@ -101,8 +107,8 @@ class encoder:
         self.input_embedding = self.position_embedding(self.sent, 4)
         multi_head_attn = self.self_attention()
         multi_head_attn_out = t.matmul(multi_head_attn, self.W_o.T) #(4,2048) * (2048, 4) = (4, 4)
-        input_embedding = self.layernorm(multi_head_attn_out + self.input_embedding)
+        input_embedding = self.layer_norm(multi_head_attn_out + self.input_embedding)
         ffn_out = self.ffn(input_embedding)
-        encoder_out = self.layernorm(ffn_out + input_embedding)
+        encoder_out = self.layer_norm(ffn_out + input_embedding)
         return encoder_out
 
