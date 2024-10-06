@@ -19,8 +19,7 @@ class encoder:
         as a result, 1024/2 = 512 for the output dim.
         The will become 1024 when it will be concatenated. 
         '''
-        self.k_dim = 512/num_heads; self.v_dim = 512/num_heads; self.q_dim = 512/num_heads        
-
+        self.k_dim = 512; self.v_dim = 512; self.q_dim = 512
         self.W_q = nn.Linear(512, self.k_dim*self.num_heads) 
         self.W_k = nn.Linear(512, self.k_dim*self.num_heads)
         self.W_v = nn.Linear(512, self.v_dim*self.num_heads)
