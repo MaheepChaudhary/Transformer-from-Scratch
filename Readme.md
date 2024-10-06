@@ -28,6 +28,13 @@ I am constantly active on Twitter and can be found posting useful things i find 
 1. Is there any better positional encoding method?
 2. How much does this positional encoding affect the model and overall generalization?
 
+
+## Encoder:
+
+
+
+![encoder image](figures/encoder.png)
+
 ## 🎀🙇🏻 Acknowledgements:
 
 - [Transformer Architecture: The Positional Encoding by Amirhossein Kazemnejad's](https://kazemnejad.com/blog/transformer_architecture_positional_encoding/)

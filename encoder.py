@@ -105,7 +105,7 @@ class encoder:
     def forward(self):
         self.input_embedding = self.position_embedding(self.sent, 4)
         multi_head_attn = self.self_attention()
-        multi_head_attn_out = t.matmul(multi_head_attn, self.W_o.T) #(4,2048) * (2048, 4) = (4, 4)
+        multi_head_attn_out = self.W_o(multi_head_attn) #(4,2048) * (2048, 4) = (4, 4)
         input_embedding = self.layer_norm(multi_head_attn_out + self.input_embedding)
         ffn_out = self.ffn(input_embedding)
         encoder_out = self.layer_norm(ffn_out + input_embedding)
