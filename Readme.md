@@ -47,6 +47,8 @@ I am constantly active on Twitter and can be found posting useful things i find 
 
 ## Encoder:
 
+* How can we think about the relevance of "key", "value" and "query"?
+
 I have explained individual modules of encoder below, including:
 
 1. Multi-Head Attention
@@ -164,12 +166,17 @@ class encoder:
 
 ## Decoder
 
+### Masked Mutli-Head Attention
+
 This is one of the least explained architecture in the related materials and the connection between decoder and encoder is not much explained. 
 However, we will try to be transparent to showcase how weights move. 
 
 ## 🎀🙇🏻 Acknowledgements:
 
 - [Transformer Architecture: The Positional Encoding by Amirhossein Kazemnejad's](https://kazemnejad.com/blog/transformer_architecture_positional_encoding/)
+- [What is Masked multi-head attention?](https://stackoverflow.com/questions/58127059/how-to-understand-masked-multi-head-attention-in-transformer)
+- [Transformer Neural Network explained by CodeEmporium](https://youtu.be/TQQlZhbC5ps?si=sf5I8zt-reSg7dqI)
+- [The Illustrated Transformer by Jay Alammar](https://jalammar.github.io/illustrated-transformer/)
 
 Connect with me or to have an e-coffee 😉 on [Twitter](https://x.com/ChaudharyMaheep) 
 
