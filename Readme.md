@@ -3,7 +3,7 @@
 I will be implementing a 1 layer Transformer architecure with with no dropouts, custom optimisation and layers.
 The implementation is built by taking the [official reserch paper](https://arxiv.org/abs/1706.03762) as basis.
 This repo will be aimed to provide insights to me and to other how really Transformers work, even at a gradient level.
-This will not only enable the users to build upon this repo but will also be able to do toy experiments; as we all are GPU poor 😛,
+This will not only enable the users to build upon this repo but will also be able to do toy experiments; as we all are GPU poor 😛. 
 There have been recent discoveries regarding the behaviour of transformers, i.e. do they learn or generalize?
 Furthermore, different experiments such as grokking for very simple experiments like prediting addition or other operation on numbers.
 This could also be used by others better understand Transformer.
