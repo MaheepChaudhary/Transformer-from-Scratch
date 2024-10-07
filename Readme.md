@@ -113,6 +113,12 @@ class encoder:
 
 ![encoder image](figures/encoder.png)
 
+
+## Decoder
+
+This is one of the least explained architecture in the related materials and the connection between decoder and encoder is not much explained. 
+However, we will try to be transparent to showcase how weights move. 
+
 ## 🎀🙇🏻 Acknowledgements:
 
 - [Transformer Architecture: The Positional Encoding by Amirhossein Kazemnejad's](https://kazemnejad.com/blog/transformer_architecture_positional_encoding/)
