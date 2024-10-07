@@ -1,7 +1,7 @@
 # 🤖🗒️ Transformer From Scratch:
 
 I will be implementing a 1 layer Transformer architecure with with no dropouts, custom optimisation and layers.
-The implementation is built by taking the [Jay Alammar's Blog](https://jalammar.github.io/illustrated-transformer) as basis.
+The implementation is built by taking the [official reserch paper](https://arxiv.org/abs/1706.03762) as basis.
 This repo will be aimed to provide insights to me and to other how really Transformers work, even at a gradient level.
 This will not only enable the users to build upon this repo but will also be able to do toy experiments; as we all are GPU poor 😛,
 There have been recent discoveries regarding the behaviour of transformers, i.e. do they learn or generalize?
@@ -46,6 +46,54 @@ I am constantly active on Twitter and can be found posting useful things i find 
 
 
 ## Encoder:
+
+I have explained individual modules of encoder below, including:
+
+1. Multi-Head Attention
+2. LayerNorm
+3. Feed-Forward Layers
+
+![encoder image](figures/encoder.png)
+
+### Multi-Head Attention:
+
+```python
+   def self_attention(self):
+
+        query = self.W_q(self.input_embedding).view(1, self.num_heads, self.seq_len, self.q_dim) # (1, 2, 4, 512)
+        key = self.W_k(self.input_embedding).view(1, self.num_heads, self.seq_len, self.k_dim) # (1, 2, 4, 512)
+        value = self.W_v(self.input_embedding).view(1, self.num_heads, self.seq_len, self.v_dim) # (1, 2, 4, 512)
+        
+        # we will take the dot product of query and key to get the similarity score.
+        attention_score = t.softmax(t.matmul(query, key.transpose(2,3))/t.sqrt(t.tensor(self.k_dim)), dim=-1) # (1, 2, 4, 4)
+        overall_attention = t.matmul(attention_score, value)
+
+        overall_attention = t.cat(overall_attention).view(1, self.seq_len, self.k_dim*self.num_heads) # (1, 4, 512)
+        
+        final_attention = self.W_o(overall_attention) # (1, 4, 512)
+                
+        return final_attention
+
+```
+
+### LayerNorm:
+
+```python
+self.layer_norm = nn.LayerNorm(512)
+```
+
+### Feed-Forward Layers:
+
+```python
+    def ffn(self, x:Tensor) -> Tensor:
+        x1 = self.fc1(x)
+        x2 = self.relu(x1)
+        x3 = self.fc2(x2)
+    
+        return x3
+```
+
+This is the whole code of Encoder: 
 
 ```python
 class encoder:
@@ -111,7 +159,7 @@ class encoder:
 ```
 
 
-![encoder image](figures/encoder.png)
+
 
 
 ## Decoder
