@@ -13,6 +13,8 @@ I hope it would be useful resource for the community.
 
 I am constantly active on Twitter and can be found posting useful things i find during my learning journey: [Twitter](https://x.com/ChaudharyMaheep)
 
+![Transformer From Scratch](figures/Transformer_from_scratch.png)
+
 ## 🧿 Positional Encoding:
 
 - We will require the position embedding to be unique for each word in the sentence. As it represents different position and having the same position will affect the learning of the model. Hence, we will need to create a bits and bytes type of representation for each word in the sentence. The LSB bit is alternating on every number, the second-lowest bit is rotating on every two numbers, and so on. However, using binary values would be inefficient in a world dominated by floating-point numbers. Instead, we can represent them with their continuous float equivalents—sinusoidal functions. These functions essentially act like alternating bits.
