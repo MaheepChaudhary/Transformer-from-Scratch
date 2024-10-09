@@ -57,19 +57,14 @@ class decoder:
     
         return x3
 
-    def multi_head_attention(self) -> Tensor:
+    def masked_multi_head_attention(self) -> Tensor:
         '''
-        We are making this function for just 1 sample. 
-        The words of which will be computed to have similarity with each other.
-        '''
-
-        '''
-        The query, key, and value are the three vectors that are used to computed with the embedding layer dim to assign a new dim.
-        '''
-        
-        query = self.W_q(self.input_embedding).view(1, self.num_heads, self.seq_len, self.q_dim) # (1, 2, 4, 512)
-        key = self.W_k(self.input_embedding).view(1, self.num_heads, self.seq_len, self.k_dim) # (1, 2, 4, 512)
-        value = self.W_v(self.input_embedding).view(1, self.num_heads, self.seq_len, self.v_dim) # (1, 2, 4, 512)
+        We are making this as the masked multi-head attention, as we are masking the future words in the sentence.
+        For reference you can look at its diagram before implementation to get an intuition about it.  
+        ''' 
+        query = self.W_q_m(self.input_embedding).view(1, self.num_heads, self.seq_len, self.q_dim) # (1, 2, 4, 512)
+        key = self.W_k_m(self.input_embedding).view(1, self.num_heads, self.seq_len, self.k_dim) # (1, 2, 4, 512)
+        value = self.W_v_m(self.input_embedding).view(1, self.num_heads, self.seq_len, self.v_dim) # (1, 2, 4, 512)
         
         # we will take the dot product of query and key to get the similarity score.
         attention_score = t.softmax(t.matmul(query, key.transpose(2,3))/t.sqrt(t.tensor(self.k_dim)), dim=-1) # (1, 2, 4, 4)
@@ -81,14 +76,17 @@ class decoder:
                 
         return final_attention
 
-    def masked_multi_head_attention(self, encoder_output: Tensor, dec_attn: Tensor) -> Tensor:
+    def multi_head_attention(self, encoder_output: Tensor, dec_attn: Tensor) -> Tensor:
         '''
-        We are making this as the masked multi-head attention, as we are masking the future words in the sentence.
-        For reference you can look at its diagram before implementation to get an intuition about it.  
-        ''' 
-        query = self.W_q_m(dec_attn).view(1, self.num_heads, self.seq_len, self.q_dim)
-        key = self.W_k_v_m(encoder_output).view(1, self.num_heads, self.seq_len, self.k_dim)
-        value = self.W_k_v_m(encoder_output).view(1, self.num_heads, self.seq_len, self.v_dim)
+        We are making this function for just 1 sample. 
+        The words of which will be computed to have similarity with each other.
+
+        The query, key, and value are the three vectors that are used to computed with the embedding layer dim to assign a new dim.
+        '''
+
+        query = self.W_q(dec_attn).view(1, self.num_heads, self.seq_len, self.q_dim)
+        key = self.W_k(encoder_output).view(1, self.num_heads, self.seq_len, self.k_dim)
+        value = self.W_v(encoder_output).view(1, self.num_heads, self.seq_len, self.v_dim)
 
         attention_score = t.matmul(query, key.transpose(2,3))/t.sqrt(t.tensor(self.k_dim))
         # Adding the attention score with the masking tensor to mask the future words in the sentence.
@@ -102,5 +100,11 @@ class decoder:
         
 
     def forward(self, encoder_output):
-        self.input_embedding = self.position_embedding(self.out_sent, 512)
-        self.multi_head_attention
+        x = self.input_embedding = self.position_embedding(self.out_sent, 512)
+        x_ = self.masked_multi_head_attention()
+        x = self.layer_norm(x_ + x)
+        x_ = self.multi_head_attention(encoder_output, x)
+        x = self.layer_norm(x + x_)
+        x_ = self.ffn(x)
+        x = self.layer_norm(x_ + x)
+        return x
