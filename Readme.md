@@ -64,7 +64,10 @@ I have explained individual modules of encoder below, including:
 
 ![encoder image](figures/encoder.png)
 
+
 ### Multi-Head Attention:
+
+![alt text](figures/mhattn.png)
 
 ```python
    def self_attention(self):
@@ -92,6 +95,8 @@ self.layer_norm = nn.LayerNorm(512)
 ```
 
 ### Feed-Forward Layers:
+
+![alt text](figures/ffn.png)
 
 ```python
     def ffn(self, x:Tensor) -> Tensor:
