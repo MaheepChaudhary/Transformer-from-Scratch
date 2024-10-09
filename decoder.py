@@ -16,7 +16,8 @@ class decoder:
         self.W_q = nn.Linear(512, self.k_dim*self.num_heads) 
         self.W_k = nn.Linear(512, self.k_dim*self.num_heads)
         self.W_v = nn.Linear(512, self.v_dim*self.num_heads)
-
+        self.masking_tensor = t.triu(t.full((1, self.num_heads, self.seq_len, self.seq_len), float("inf")), diagonal = 1)
+        
         self.seq_len = out_sent.size()[0]
         assert self.seq_len == 4, "The sequence length should be 4."
         
@@ -29,9 +30,6 @@ class decoder:
         self.relu = nn.ReLU()
 
     
-    def masked_multi_head_attention(self):
-        pass
-
     def position_embedding(self, sent: Tensor, d_model: int) -> Tensor:
         '''
         Defined in depth in the encoder.py file. 
@@ -54,7 +52,7 @@ class decoder:
     
         return x3
 
-    def multi_head_attention(self):
+    def multi_head_attention(self, encoder_output: Tensor, dec_attn: Tensor) -> Tensor:
         '''
         We are making this function for just 1 sample. 
         The words of which will be computed to have similarity with each other.
@@ -77,6 +75,23 @@ class decoder:
         final_attention = self.W_o(overall_attention) # (1, 4, 512)
                 
         return final_attention
+
+    def masked_multi_head_attention(self, encoder_output: Tensor, dec_attn: Tensor) -> Tensor:
+        '''
+        We are making this as the masked multi-head attention, as we are masking the future words in the sentence.
+        For reference you can look at its diagram before implementation to get an intuition about it.  
+        ''' 
+        query = self.W_q_m(dec_attn).view(1, self.num_heads, self.seq_len, self.q_dim)
+        key = self.W_k_v_m(encoder_output).view(1, self.num_heads, self.seq_len, self.k_dim)
+        value = self.W_k_v_m(encoder_output).view(1, self.num_heads, self.seq_len, self.v_dim)
+
+        attention_score = t.matmul(query, key.transpose(2,3))/t.sqrt(t.tensor(self.k_dim))
+        # Adding the attention score with the masking tensor to mask the future words in the sentence.
+        attention_score = t.softmax((attention_score + self.masking_tensor), dim = -1)
+        
+        overall_attention = t.matmul(attention_score, value)
+        return overall_attention 
+        
 
     def forward(self):
         pass
