@@ -57,7 +57,7 @@ class decoder:
     
         return x3
 
-    def multi_head_attention(self, encoder_output: Tensor, dec_attn: Tensor) -> Tensor:
+    def multi_head_attention(self) -> Tensor:
         '''
         We are making this function for just 1 sample. 
         The words of which will be computed to have similarity with each other.
@@ -101,5 +101,6 @@ class decoder:
         return final_attention 
         
 
-    def forward(self):
-        pass
+    def forward(self, encoder_output):
+        self.input_embedding = self.position_embedding(self.out_sent, 512)
+        self.multi_head_attention
