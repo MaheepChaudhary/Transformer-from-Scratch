@@ -19,6 +19,8 @@ I am constantly active on Twitter and can be found posting useful things i find 
 
 *[It is advicable to view the figure on a big screen if not, then to be zoomed out, to know the nitty-gritties of the figure.]*
 
+**NOTE:** Only the unique components of the model are explained below. Common elements, such as multi-head attention, if repeated in the decoder, will not be explained again. 
+
 
 ## 🧿 Positional Encoding:
 
@@ -54,9 +56,12 @@ I am constantly active on Twitter and can be found posting useful things i find 
 
 ## Encoder:
 
-* How can we think about the relevance of "key", "value" and "query"?
+* How can we think about the relevance of "key", "value," and "query"?
+  - The "query" can be seen as the question being asked, while the "keys" represent the context or references used to determine how closely the query matches. The "values" hold the actual information or answers, and the most relevant value is selected based on the similarity between the query and the keys.
 
-I have explained individual modules of encoder below, including:
+![alt text](figures/qkv.png)
+
+The other components of the encoder are explained in detail below, especially:
 
 1. Multi-Head Attention
 2. LayerNorm
@@ -66,6 +71,10 @@ I have explained individual modules of encoder below, including:
 
 
 ### Multi-Head Attention:
+
+Multiple matrices, such as `W_q`, `W_k`, and `W_v`, are used to extract content from the input embeddings, transforming them into *queries*, *keys*, and *values*. The use of multiple heads allows the model to capture different aspects of the context for each query. This can be likened to a student having the ability to ask several questions (multiple heads) versus only being allowed to ask a single question (one head), thus enabling a richer understanding. 
+
+All heads outputs are finally concatenated and filtered through a linear layer, which projects it into the dimension equivalent to a single head.  
 
 ![alt text](figures/mhattn.png)
 
@@ -90,6 +99,14 @@ I have explained individual modules of encoder below, including:
 
 ### LayerNorm:
 
+Layer normalization is a crucial technique used in transformers that helps stabilize and accelerate the training process, which normalizes the inputs to each layer, ensuring that they have a mean of zero and a standard deviation of one. This helps to stabilize the distribution of activations during training, which can lead to more consistent learning. As a result, producing the following effects on the network learning:
+1. **Reduces Internal Covariate Shift:** By normalizing the inputs to each layer, layer normalization reduces the problem of internal covariate shift. This means that the distribution of inputs to each layer remains relatively constant throughout training, which helps improve convergence rates.
+2. **Improves Gradient Flow:** By normalizing the inputs, layer normalization can mitigate issues with vanishing or exploding gradients. This is particularly important in deep networks like transformers, where gradient flow can be problematic.
+3. **Faster Convergence:** With more stable training dynamics, models often converge faster, requiring fewer epochs to achieve similar performance levels compared to models without normalization.
+4. **Independence from Batch Size:** Unlike batch normalization, which normalizes across a batch of inputs, layer normalization normalizes across the features for each individual sample. This makes it particularly well-suited for transformer architectures, where variable sequence lengths and batch sizes are common.
+5. **Facilitates Training with Larger Learning Rates:** Layer normalization allows for the use of larger learning rates, which can further accelerate training and lead to better final performance.
+6. **Enhances Generalization:** The normalization process can help the model generalize better to unseen data by reducing overfitting tendencies, as it adds a level of regularization.
+
 ![(https://www.pinecone.io/learn/batch-layer-normalization/)](figures/layer_normalisation.png)
 
 
@@ -100,6 +117,9 @@ self.layer_norm = nn.LayerNorm(512)
 ```
 
 ### Feed-Forward Layers:
+
+The feed-forward layers module consist of 2 layers with a linear activation `ReLU` between them. 
+The architecture of the module allows the former layer to project the output into a higher dimension, while the latter projects it into original space. 
 
 ![alt text](figures/ffn.png)
 
