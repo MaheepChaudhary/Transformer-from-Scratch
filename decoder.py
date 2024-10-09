@@ -16,12 +16,17 @@ class decoder:
         self.W_q = nn.Linear(512, self.k_dim*self.num_heads) 
         self.W_k = nn.Linear(512, self.k_dim*self.num_heads)
         self.W_v = nn.Linear(512, self.v_dim*self.num_heads)
+        self.W_q_m = nn.Linear(512, self.k_dim*self.num_heads)
+        self.W_k_m = nn.Linear(512, self.k_dim*self.num_heads)
+        self.W_v_m = nn.Linear(512, self.v_dim*self.num_heads)
+ 
         self.masking_tensor = t.triu(t.full((1, self.num_heads, self.seq_len, self.seq_len), float("inf")), diagonal = 1)
         
         self.seq_len = out_sent.size()[0]
         assert self.seq_len == 4, "The sequence length should be 4."
         
         self.W_o = nn.Linear(512*self.num_heads,512) 
+        self.W_o_m = nn.Linear(512*self.num_heads,512)
         
         self.layer_norm = nn.LayerNorm(512)
         
@@ -90,7 +95,10 @@ class decoder:
         attention_score = t.softmax((attention_score + self.masking_tensor), dim = -1)
         
         overall_attention = t.matmul(attention_score, value)
-        return overall_attention 
+        overall_attention = t.cat(overall_attention).view(1, self.seq_len, self.k_dim*self.num_heads)
+        final_attention = self.W_o_m(overall_attention)
+        
+        return final_attention 
         
 
     def forward(self):
