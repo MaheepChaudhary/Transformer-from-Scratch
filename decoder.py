@@ -2,7 +2,7 @@ from imports import *
 
 class decoder:
 
-    def __init__(self, num_heads: int, out_sent: Tensor) -> None:
+    def __init__(self, num_heads: int, out_sent: Tensor, encoder_output: Tensor) -> None:
         super(decoder, self).__init__()
         self.out_sent = out_sent
         self.num_heads = num_heads
@@ -12,6 +12,8 @@ class decoder:
         as a result, 1024/2 = 512 for the output dim.
         The will become 1024 when it will be concatenated. 
         '''
+        self.encoder_output = encoder_output
+        
         self.k_dim = 512; self.v_dim = 512; self.q_dim = 512
         self.W_q = nn.Linear(512, self.k_dim*self.num_heads) 
         self.W_k = nn.Linear(512, self.k_dim*self.num_heads)
@@ -99,11 +101,11 @@ class decoder:
         return final_attention 
         
 
-    def forward(self, encoder_output):
+    def forward(self) -> Tensor:
         x = self.input_embedding = self.position_embedding(self.out_sent, 512)
         x_ = self.masked_multi_head_attention()
         x = self.layer_norm(x_ + x)
-        x_ = self.multi_head_attention(encoder_output, x)
+        x_ = self.multi_head_attention(self.encoder_output, x)
         x = self.layer_norm(x + x_)
         x_ = self.ffn(x)
         x = self.layer_norm(x_ + x)
