@@ -203,6 +203,8 @@ class encoder:
 
 ## Decoder
 
+The decoder module takes the output or ground-truth sentence as input. 
+
 ![alt text](figures/decoder.png)
 
 ### Multi-Head Attention
@@ -266,6 +268,8 @@ However, we will try to be transparent to showcase how weights move.
 - TBW
 
 ## 🎀🙇🏻 Acknowledgements:
+
+I am grateful to [Dr. Michael Sklar](https://statistics.stanford.edu/people/michael-benjamin-sklar) and [Atif Hassan](https://github.com/atif-hassan) for helping me during the prepartion of this repository. I am also grateful to family, friends and online resources mentioned:
 
 - [Transformer Architecture: The Positional Encoding by Amirhossein Kazemnejad's](https://kazemnejad.com/blog/transformer_architecture_positional_encoding/)
 - [What is Masked multi-head attention?](https://stackoverflow.com/questions/58127059/how-to-understand-masked-multi-head-attention-in-transformer)
