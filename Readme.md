@@ -1,7 +1,8 @@
-# 🤖🗒️ Transformer From Scratch:
+# 🤖🗒️ Transformer From Scratch
 
-### <p align="center"><b>Hit the star 🌟 if you like the repo 😄</b></p>
+<p align="center"><Big><b>Hit the star 🌟 if you like the repo 😄</Big></b></p>
 <p align="center">.</p>
+
 
 
 The implementation is built by taking the [official reserch paper](https://arxiv.org/abs/1706.03762) as basis. This repo will be aimed to provide insights to me and to other how really Transformers work, even at gradients level. This repository aimed to implementing a 1-layer Transformer architecure with with no dropouts, custom optimisation and layers. This will not only enable the users to build upon this repo but will also be able to do toy experiments; as we all are GPU poor 😛. This light architecture can be easily understood and used by the community to inquire more about how tranformers learn and generalize? Furthermore, different experiments such as grokking for very simple experiments like prediting addition or other operation on numbers. This could also be used by others better understand Transformer.
@@ -12,8 +13,23 @@ The implementation is built by taking the [official reserch paper](https://arxiv
 
 *If you have any question or you would like me to add something, then please feel free to create an issue.*
 
+## 📑 Table of Contents
 
-## 🧿 Positional Encoding:
+- [🤖🗒️ Transformer From Scratch](#️-transformer-from-scratch)
+  - [📑 Table of Contents](#-table-of-contents)
+  - [🧿 Positional Encoding](#-positional-encoding)
+  - [🍀🎃 Encoder](#-encoder)
+    - [🐷 Multi-Head Attention](#-multi-head-attention)
+    - [🤥 LayerNorm](#-layernorm)
+    - [🥳 Feed-Forward Layers:](#-feed-forward-layers)
+  - [🐳🐙 Decoder](#-decoder)
+    - [🐸 Masked Multi-Head Attention](#-masked-multi-head-attention)
+    - [🦃 Multi-Head Attention](#-multi-head-attention-1)
+  - [🍾👨‍🎓 Exercise to understand Architecture in Depth.](#-exercise-to-understand-architecture-in-depth)
+  - [🎀🙇🏻 Acknowledgements:](#-acknowledgements)
+  - [Connect with me 😀 ](#connect-with-me--)
+
+## 🧿 Positional Encoding
 
 - We will require the position embedding to be unique for each word in the sentence. As it represents different position and having the same position will affect the learning of the model. Hence, we will need to create a bits and bytes type of representation for each word in the sentence. The LSB bit is alternating on every number, the second-lowest bit is rotating on every two numbers, and so on. However, using binary values would be inefficient in a world dominated by floating-point numbers. Instead, we can represent them with their continuous float equivalents—sinusoidal functions. These functions essentially act like alternating bits.
 
@@ -45,7 +61,7 @@ The implementation is built by taking the [official reserch paper](https://arxiv
 2. How much does this positional encoding affect the model and overall generalization? -->
 
 
-## 🍀🎃 Encoder:
+## 🍀🎃 Encoder
 
 * How can we think about the relevance of "key", "value," and "query"?
   - The "query" can be seen as the question being asked, while the "keys" represent the context or references used to determine how closely the query matches. The "values" hold the actual information or answers, and the most relevant value is selected based on the similarity between the query and the keys.
@@ -61,7 +77,7 @@ The other components of the encoder are explained in detail below, especially:
 ![encoder image](figures/encoder.png)
 
 
-### 🐷 Multi-Head Attention:
+### 🐷 Multi-Head Attention
 
 Multiple matrices, such as `W_q`, `W_k`, and `W_v`, are used to extract content from the input embeddings, transforming them into *queries*, *keys*, and *values*. The use of multiple heads allows the model to capture different aspects of the context for each query. This can be likened to a student having the ability to ask several questions (multiple heads) versus only being allowed to ask a single question (one head), thus enabling a richer understanding. 
 
@@ -88,7 +104,7 @@ All heads outputs are finally concatenated and filtered through a linear layer, 
 
 ```
 
-### 🤥 LayerNorm:
+### 🤥 LayerNorm
 
 Layer normalization is a crucial technique used in transformers that helps stabilize and accelerate the training process, which normalizes the inputs to each layer, ensuring that they have a mean of zero and a standard deviation of one. This helps to stabilize the distribution of activations during training, which can lead to more consistent learning. As a result, producing the following effects on the network learning:
 1. **Reduces Internal Covariate Shift:** By normalizing the inputs to each layer, layer normalization reduces the problem of internal covariate shift. This means that the distribution of inputs to each layer remains relatively constant throughout training, which helps improve convergence rates.
