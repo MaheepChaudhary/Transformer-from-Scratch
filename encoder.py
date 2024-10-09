@@ -38,7 +38,7 @@ class encoder:
     
 
     # we will make two heads for multi-head attention
-    def self_attention(self):
+    def multi_head_attention(self):
         '''
         We are making this function for just 1 sample. 
         The words of which will be computed to have similarity with each other.
