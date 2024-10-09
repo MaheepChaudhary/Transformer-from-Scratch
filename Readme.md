@@ -42,7 +42,7 @@ I am constantly active on Twitter and can be found posting useful things i find 
 
 ![alt text](figures/positional_encoding.png)
 
-<p align="center"><em>Figure 2 - The 128-dimensional positonal encoding for a sentence with the maximum lenght of 50. Each row represents the embedding vector</em></p>
+<p align="center"><em>Figure 2 - The 128-dimensional positonal encoding for a sentence with the maximum lenght of 50. Each row represents the embedding vector [<a href = "https://kazemnejad.com/blog/transformer_architecture_positional_encoding/">1</a>].</em></p>
 
 <!-- please write about this image also -->
 
@@ -89,6 +89,11 @@ I have explained individual modules of encoder below, including:
 ```
 
 ### LayerNorm:
+
+![(https://www.pinecone.io/learn/batch-layer-normalization/)](figures/layer_normalisation.png)
+
+
+<center><i>Figure 2: Layer Normalisation happens between same set of features of different samples [<a href = "https://www.pinecone.io/learn/batch-layer-normalization/">2</a>].</i></center>
 
 ```python
 self.layer_norm = nn.LayerNorm(512)
@@ -179,6 +184,34 @@ class encoder:
 ## Decoder
 
 ![alt text](figures/decoder.png)
+
+### Multi-Head Attention
+
+![alt text](figures/dmmattn.png)
+
+```python
+    def multi_head_attention(self, encoder_output: Tensor, dec_attn: Tensor) -> Tensor:
+        '''
+        We are making this function for just 1 sample. 
+        The words of which will be computed to have similarity with each other.
+
+        The query, key, and value are the three vectors that are used to computed with the embedding layer dim to assign a new dim.
+        '''
+
+        query = self.W_q(dec_attn).view(1, self.num_heads, self.seq_len, self.q_dim)
+        key = self.W_k(encoder_output).view(1, self.num_heads, self.seq_len, self.k_dim)
+        value = self.W_v(encoder_output).view(1, self.num_heads, self.seq_len, self.v_dim)
+
+        attention_score = t.matmul(query, key.transpose(2,3))/t.sqrt(t.tensor(self.k_dim))
+        # Adding the attention score with the masking tensor to mask the future words in the sentence.
+        attention_score = t.softmax((attention_score + self.masking_tensor), dim = -1)
+        
+        overall_attention = t.matmul(attention_score, value)
+        overall_attention = t.cat(overall_attention).view(1, self.seq_len, self.k_dim*self.num_heads)
+        final_attention = self.W_o_m(overall_attention)
+        
+        return final_attention 
+```
 
 ### Masked Mutli-Head Attention
 
