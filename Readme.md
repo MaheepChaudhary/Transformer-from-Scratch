@@ -1,6 +1,6 @@
 # 🤖🗒️ Transformer From Scratch
 
-<p align="center"><Big><b>Hit the star 🌟 if you like the repo 😄</Big></b></p>
+<h2><p align="center"><b>Hit the star 🌟 if you like the repo 😄</b></p></h2>
 <p align="center">.</p>
 
 
