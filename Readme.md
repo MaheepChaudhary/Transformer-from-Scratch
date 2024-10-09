@@ -173,7 +173,11 @@ class encoder:
 
 ## Decoder
 
+![alt text](figures/decoder.png)
+
 ### Masked Mutli-Head Attention
+
+![alt text](figures/mmheadattn.png)
 
 ```python
     def masked_multi_head_attention(self, encoder_output: Tensor, dec_attn: Tensor) -> Tensor:
@@ -199,9 +203,9 @@ class encoder:
 This is one of the least explained architecture in the related materials and the connection between decoder and encoder is not much explained. 
 However, we will try to be transparent to showcase how weights move. 
 
-## Beginner exercises to understand Architecture in Depth.
+## Exercise to understand Architecture in Depth.
 
-- TBD
+- TBW
 
 ## 🎀🙇🏻 Acknowledgements:
 
