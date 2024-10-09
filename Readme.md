@@ -1,14 +1,14 @@
 # 🤖🗒️ Transformer From Scratch:
 
-### <center><b>Hit the star 🌟 if you like the repo 😄</b></center>
-<center>.</center>
+### <p align="center"><b>Hit the star 🌟 if you like the repo 😄</b></p>
+<p align="center">.</p>
 
 
 The implementation is built by taking the [official reserch paper](https://arxiv.org/abs/1706.03762) as basis. This repo will be aimed to provide insights to me and to other how really Transformers work, even at gradients level. This repository aimed to implementing a 1-layer Transformer architecure with with no dropouts, custom optimisation and layers. This will not only enable the users to build upon this repo but will also be able to do toy experiments; as we all are GPU poor 😛. This light architecture can be easily understood and used by the community to inquire more about how tranformers learn and generalize? Furthermore, different experiments such as grokking for very simple experiments like prediting addition or other operation on numbers. This could also be used by others better understand Transformer.
 
 ![Transformer From Scratch](figures/Transformer_from_scratch.png)
 
-<center><u>[Use Big-Screen for better view]</u></center>
+<p align="center"><u>[Use Big-Screen for better view]</u></p>
 
 *If you have any question or you would like me to add something, then please feel free to create an issue.*
 
