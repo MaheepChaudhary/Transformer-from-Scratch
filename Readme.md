@@ -1,6 +1,6 @@
 # 🤖🗒️ Transformer From Scratch:
 
-**Give it a star 🌟 if you like the repo 😄.**
+**Hit the star 🌟 if you like the repo 😄.**
 
 I will be implementing a 1 layer Transformer architecure with with no dropouts, custom optimisation and layers.
 The implementation is built by taking the [official reserch paper](https://arxiv.org/abs/1706.03762) as basis.
