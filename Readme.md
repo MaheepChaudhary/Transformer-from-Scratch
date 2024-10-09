@@ -175,6 +175,27 @@ class encoder:
 
 ### Masked Mutli-Head Attention
 
+```python
+    def masked_multi_head_attention(self, encoder_output: Tensor, dec_attn: Tensor) -> Tensor:
+        '''
+        We are making this as the masked multi-head attention, as we are masking the future words in the sentence.
+        For reference you can look at its diagram before implementation to get an intuition about it.  
+        ''' 
+        query = self.W_q_m(dec_attn).view(1, self.num_heads, self.seq_len, self.q_dim)
+        key = self.W_k_v_m(encoder_output).view(1, self.num_heads, self.seq_len, self.k_dim)
+        value = self.W_k_v_m(encoder_output).view(1, self.num_heads, self.seq_len, self.v_dim)
+
+        attention_score = t.matmul(query, key.transpose(2,3))/t.sqrt(t.tensor(self.k_dim))
+        # Adding the attention score with the masking tensor to mask the future words in the sentence.
+        attention_score = t.softmax((attention_score + self.masking_tensor), dim = -1)
+        
+        overall_attention = t.matmul(attention_score, value)
+        overall_attention = t.cat(overall_attention).view(1, self.seq_len, self.k_dim*self.num_heads)
+        final_attention = self.W_o_m(overall_attention)
+        
+        return final_attention 
+```
+
 This is one of the least explained architecture in the related materials and the connection between decoder and encoder is not much explained. 
 However, we will try to be transparent to showcase how weights move. 
 
