@@ -218,6 +218,7 @@ The decoder takes the output or ground-truth sentence as input and adds position
 
 ![alt text](figures/decoder.png)
 
+
 ### 🐸 Masked Multi-Head Attention
 
 In the masked multi-head attention module, the input is the sentence with added positional embeddings. The attention mechanism works similarly to the encoder, using "query," "key," and "value." However, the key difference is the inclusion of a masking tensor. This mask ensures that the model cannot access future token representations when predicting the next token, relying only on past information.
