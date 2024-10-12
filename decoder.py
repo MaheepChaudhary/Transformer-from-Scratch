@@ -24,7 +24,7 @@ class decoder:
  
         self.seq_len = out_sent.size()[0]
         assert self.seq_len == 4, "The sequence length should be 4."
-        self.masking_tensor = t.triu(t.full((1, self.num_heads, self.seq_len, self.seq_len), float("inf")), diagonal = 1)
+        self.masking_tensor = t.triu(t.full((1, self.num_heads, self.seq_len, self.seq_len), float("-inf")), diagonal = 1)
         
         self.W_o = nn.Linear(512*self.num_heads,512, dtype = t.float32) 
         self.W_o_m = nn.Linear(512*self.num_heads,512, dtype = t.float32)
@@ -91,6 +91,7 @@ class decoder:
         attention_score = t.matmul(query, key.transpose(2,3))/t.sqrt(t.tensor(self.k_dim))
         # Adding the attention score with the masking tensor to mask the future words in the sentence.
         attention_score = t.softmax((attention_score + self.masking_tensor), dim = -1)
+        print(attention_score)
         
         overall_attention = t.matmul(attention_score, value).view(1, 4, self.d_model*self.num_heads)
         final_attention = self.W_o_m(overall_attention)
@@ -102,7 +103,7 @@ class decoder:
         x = self.input_embedding = self.position_embedding(self.out_sent, 512)
         x_ = self.masked_multi_head_attention()
         x = self.layer_norm(x_ + x)
-        x_ = self.multi_head_attention(self.encoder_output, x)
+        x_ = self.multi_head_attention(self.encoder_output, x) # this is creating the issue.
         x = self.layer_norm(x + x_)
         x_ = self.ffn(x)
         x = self.layer_norm(x_ + x)
