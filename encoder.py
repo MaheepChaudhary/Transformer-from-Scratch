@@ -48,17 +48,14 @@ class encoder:
         '''
         The query, key, and value are the three vectors that are used to computed with the embedding layer dim to assign a new dim.
         '''
-        print(self.input_embedding.shape)        
         query = self.W_q(self.input_embedding).view(1, self.num_heads, self.seq_len, self.q_dim) # (1, 2, 4, 512)
         key = self.W_k(self.input_embedding).view(1, self.num_heads, self.seq_len, self.k_dim) # (1, 2, 4, 512)
         value = self.W_v(self.input_embedding).view(1, self.num_heads, self.seq_len, self.v_dim) # (1, 2, 4, 512)
         
         # we will take the dot product of query and key to get the similarity score.
         attention_score = t.softmax(t.matmul(query, key.transpose(2,3))/t.sqrt(t.tensor(self.k_dim)), dim=-1) # (1, 2, 4, 4)
-        overall_attention = t.matmul(attention_score, value)
-
-        overall_attention = t.cat(overall_attention).view(1, self.seq_len, self.k_dim*self.num_heads) # (1, 4, 512)
-        
+        overall_attention = t.matmul(attention_score, value).view(1, 4, 512*self.num_heads)
+        print(overall_attention.shape)        
         final_attention = self.W_o(overall_attention) # (1, 4, 512)
                 
         return final_attention
@@ -93,7 +90,7 @@ class encoder:
                 pe[pos][i+1] = math.cos(pos/(10000**(2*i/d_model)))
 
         # adding positional encoding to the sentence, that will be passed into the transformer (encoder/decoder).
-        final_sent = sent + pe
+        final_sent = sent.unsqueeze(1) + pe
         return t.tensor(final_sent, dtype = t.float32)
 
     def ffn(self, x:Tensor) -> Tensor:
@@ -106,8 +103,7 @@ class encoder:
     def forward(self):
         self.input_embedding = self.position_embedding(self.sent, self.d_model)
         multi_head_attn = self.multi_head_attention()
-        multi_head_attn_out = self.W_o(multi_head_attn) #(4,2048) * (2048, 4) = (4, 4)
-        input_embedding = self.layer_norm(multi_head_attn_out + self.input_embedding)
+        input_embedding = self.layer_norm(multi_head_attn + self.input_embedding)
         ffn_out = self.ffn(input_embedding)
         encoder_out = self.layer_norm(ffn_out + input_embedding)
         return encoder_out
