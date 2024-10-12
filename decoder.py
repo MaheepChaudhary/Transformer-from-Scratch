@@ -15,26 +15,27 @@ class decoder:
         self.encoder_output = encoder_output
         
         self.k_dim = 512; self.v_dim = 512; self.q_dim = 512
-        self.W_q = nn.Linear(512, self.k_dim*self.num_heads) 
-        self.W_k = nn.Linear(512, self.k_dim*self.num_heads)
-        self.W_v = nn.Linear(512, self.v_dim*self.num_heads)
-        self.W_q_m = nn.Linear(512, self.k_dim*self.num_heads)
-        self.W_k_m = nn.Linear(512, self.k_dim*self.num_heads)
-        self.W_v_m = nn.Linear(512, self.v_dim*self.num_heads)
+        self.W_q = nn.Linear(512, self.k_dim*self.num_heads, dtype = t.float32) 
+        self.W_k = nn.Linear(512, self.k_dim*self.num_heads, dtype = t.float32)
+        self.W_v = nn.Linear(512, self.v_dim*self.num_heads, dtype = t.float32)
+        self.W_q_m = nn.Linear(512, self.k_dim*self.num_heads, dtype = t.float32)
+        self.W_k_m = nn.Linear(512, self.k_dim*self.num_heads, dtype = t.float32)
+        self.W_v_m = nn.Linear(512, self.v_dim*self.num_heads, dtype = t.float32)
  
         self.seq_len = out_sent.size()[0]
         assert self.seq_len == 4, "The sequence length should be 4."
         self.masking_tensor = t.triu(t.full((1, self.num_heads, self.seq_len, self.seq_len), float("inf")), diagonal = 1)
         
-        self.W_o = nn.Linear(512*self.num_heads,512) 
-        self.W_o_m = nn.Linear(512*self.num_heads,512)
+        self.W_o = nn.Linear(512*self.num_heads,512, dtype = t.float32) 
+        self.W_o_m = nn.Linear(512*self.num_heads,512, dtype = t.float32)
         
-        self.layer_norm = nn.LayerNorm(512)
+        self.layer_norm = nn.LayerNorm(512, dtype = t.float32)
         
-        self.fc1 = nn.Linear(512, 1024)
-        self.fc2 = nn.Linear(1024, 512)
+        self.fc1 = nn.Linear(512, 1024, dtype = t.float32)
+        self.fc2 = nn.Linear(1024, 512, dtype = t.float32)
         self.relu = nn.ReLU()
 
+        self.d_model = 512
     
     def position_embedding(self, sent: Tensor, d_model: int) -> Tensor:
         '''
@@ -42,14 +43,14 @@ class decoder:
         '''
         pe = np.zeros((sent.size()[0], d_model))
 
-        for pos, word in enumerate(sent.size()[0]):
+        for pos, word in enumerate(range(sent.size()[0])):
             for i in range(0,d_model, 2):
                 pe[pos][i] = math.sin(pos/(10000**(2*i/d_model)))
                 pe[pos][i+1] = math.cos(pos/(10000**(2*i/d_model)))
 
         # adding positional encoding to the sentence, that will be passed into the transformer (encoder/decoder).
-        final_sent = sent + pe
-        return t.tensor(final_sent)
+        final_sent = sent.unsqueeze(1) + pe
+        return t.tensor(final_sent, dtype = t.float32)
 
     def ffn(self, x:Tensor) -> Tensor:
         x1 = self.fc1(x)
@@ -69,9 +70,7 @@ class decoder:
         
         # we will take the dot product of query and key to get the similarity score.
         attention_score = t.softmax(t.matmul(query, key.transpose(2,3))/t.sqrt(t.tensor(self.k_dim)), dim=-1) # (1, 2, 4, 4)
-        overall_attention = t.matmul(attention_score, value)
-
-        overall_attention = t.cat(overall_attention).view(1, self.seq_len, self.k_dim*self.num_heads) # (1, 4, 512)
+        overall_attention = t.matmul(attention_score, value).view(1, 4, self.d_model*self.num_heads)
         
         final_attention = self.W_o(overall_attention) # (1, 4, 512)
                 
@@ -93,8 +92,7 @@ class decoder:
         # Adding the attention score with the masking tensor to mask the future words in the sentence.
         attention_score = t.softmax((attention_score + self.masking_tensor), dim = -1)
         
-        overall_attention = t.matmul(attention_score, value)
-        overall_attention = t.cat(overall_attention).view(1, self.seq_len, self.k_dim*self.num_heads)
+        overall_attention = t.matmul(attention_score, value).view(1, 4, self.d_model*self.num_heads)
         final_attention = self.W_o_m(overall_attention)
         
         return final_attention 
