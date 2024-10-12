@@ -91,7 +91,6 @@ class decoder:
         attention_score = t.matmul(query, key.transpose(2,3))/t.sqrt(t.tensor(self.k_dim))
         # Adding the attention score with the masking tensor to mask the future words in the sentence.
         attention_score = t.softmax((attention_score + self.masking_tensor), dim = -1)
-        print(attention_score)
         
         overall_attention = t.matmul(attention_score, value).view(1, 4, self.d_model*self.num_heads)
         final_attention = self.W_o_m(overall_attention)
