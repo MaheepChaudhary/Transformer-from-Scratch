@@ -22,10 +22,9 @@ class decoder:
         self.W_k_m = nn.Linear(512, self.k_dim*self.num_heads)
         self.W_v_m = nn.Linear(512, self.v_dim*self.num_heads)
  
-        self.masking_tensor = t.triu(t.full((1, self.num_heads, self.seq_len, self.seq_len), float("inf")), diagonal = 1)
-        
         self.seq_len = out_sent.size()[0]
         assert self.seq_len == 4, "The sequence length should be 4."
+        self.masking_tensor = t.triu(t.full((1, self.num_heads, self.seq_len, self.seq_len), float("inf")), diagonal = 1)
         
         self.W_o = nn.Linear(512*self.num_heads,512) 
         self.W_o_m = nn.Linear(512*self.num_heads,512)

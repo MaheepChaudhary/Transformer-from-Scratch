@@ -19,7 +19,7 @@ if __name__ == "__main__":
     args = parser.parse_args()
     
     # Creating the encoder object
-    enc_output = encoder(args.num_heads, sent)
-    decoder_output = decoder(args.num_heads, out_sent, enc_output)
+    enc_output = encoder(args.num_heads, sent).forward()
+    decoder_output = decoder(args.num_heads, out_sent, enc_output).forward()
     predicted_output_probs = output(decoder_output, sent, out_sent)
     print(predicted_output_probs)

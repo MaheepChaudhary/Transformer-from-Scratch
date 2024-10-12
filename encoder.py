@@ -20,9 +20,9 @@ class encoder:
         The will become 1024 when it will be concatenated. 
         '''
         self.k_dim = 512; self.v_dim = 512; self.q_dim = 512
-        self.W_q = nn.Linear(512, self.k_dim*self.num_heads) 
-        self.W_k = nn.Linear(512, self.k_dim*self.num_heads)
-        self.W_v = nn.Linear(512, self.v_dim*self.num_heads)
+        self.W_q = nn.Linear(512, self.k_dim*self.num_heads, dtype=t.float32)
+        self.W_k = nn.Linear(512, self.k_dim*self.num_heads, dtype = t.float32)
+        self.W_v = nn.Linear(512, self.v_dim*self.num_heads, dtype = t.float32)
 
         self.seq_len = sent.size()[0]
         assert self.seq_len == 4, "The sequence length should be 4."
@@ -34,7 +34,8 @@ class encoder:
         self.fc1 = nn.Linear(512, 1024)
         self.fc2 = nn.Linear(1024, 512)
         self.relu = nn.ReLU()
-
+        
+        self.d_model = 512
     
 
     # we will make two heads for multi-head attention
@@ -47,7 +48,7 @@ class encoder:
         '''
         The query, key, and value are the three vectors that are used to computed with the embedding layer dim to assign a new dim.
         '''
-        
+        print(self.input_embedding.shape)        
         query = self.W_q(self.input_embedding).view(1, self.num_heads, self.seq_len, self.q_dim) # (1, 2, 4, 512)
         key = self.W_k(self.input_embedding).view(1, self.num_heads, self.seq_len, self.k_dim) # (1, 2, 4, 512)
         value = self.W_v(self.input_embedding).view(1, self.num_heads, self.seq_len, self.v_dim) # (1, 2, 4, 512)
@@ -86,14 +87,14 @@ class encoder:
 
         pe = np.zeros((sent.size()[0], d_model))
 
-        for pos, word in enumerate(sent.size()[0]):
+        for pos, word in enumerate(range(sent.size()[0])):
             for i in range(0,d_model, 2):
                 pe[pos][i] = math.sin(pos/(10000**(2*i/d_model)))
                 pe[pos][i+1] = math.cos(pos/(10000**(2*i/d_model)))
 
         # adding positional encoding to the sentence, that will be passed into the transformer (encoder/decoder).
         final_sent = sent + pe
-        return t.tensor(final_sent)
+        return t.tensor(final_sent, dtype = t.float32)
 
     def ffn(self, x:Tensor) -> Tensor:
         x1 = self.fc1(x)
@@ -103,8 +104,8 @@ class encoder:
         return x3
 
     def forward(self):
-        self.input_embedding = self.position_embedding(self.sent, 4)
-        multi_head_attn = self.self_attention()
+        self.input_embedding = self.position_embedding(self.sent, self.d_model)
+        multi_head_attn = self.multi_head_attention()
         multi_head_attn_out = self.W_o(multi_head_attn) #(4,2048) * (2048, 4) = (4, 4)
         input_embedding = self.layer_norm(multi_head_attn_out + self.input_embedding)
         ffn_out = self.ffn(input_embedding)
