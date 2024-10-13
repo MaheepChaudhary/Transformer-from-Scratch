@@ -42,8 +42,6 @@ class Encoder(nn.Module):
         self.relu = nn.ReLU()
 
         # Ensure all parameters require gradients
-        for param in self.parameters():
-            param.requires_grad = True
         
         self.d_model = 512
     
