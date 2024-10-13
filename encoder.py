@@ -1,15 +1,18 @@
-from imports import *
+import torch as t
+import torch.nn as nn
+import numpy as np
+import math
+from torch import Tensor
 
 
-
-class encoder:
+class Encoder(nn.Module):
 
     def __init__(
         self,
         num_heads: int,
         sent: Tensor) -> None:
         
-        super(encoder, self).__init__()
+        super(Encoder, self).__init__()
         
         self.sent = sent
         self.num_heads = num_heads
@@ -19,21 +22,28 @@ class encoder:
         as a result, 1024/2 = 512 for the output dim.
         The will become 1024 when it will be concatenated. 
         '''
-        self.k_dim = 512; self.v_dim = 512; self.q_dim = 512
-        self.W_q = nn.Linear(512, self.k_dim*self.num_heads, dtype=t.float32)
-        self.W_k = nn.Linear(512, self.k_dim*self.num_heads, dtype = t.float32)
-        self.W_v = nn.Linear(512, self.v_dim*self.num_heads, dtype = t.float32)
+        self.k_dim = 512
+        self.v_dim = 512
+        self.q_dim = 512
+        
+        self.W_q = nn.Linear(512, self.k_dim * self.num_heads)
+        self.W_k = nn.Linear(512, self.k_dim * self.num_heads)
+        self.W_v = nn.Linear(512, self.v_dim * self.num_heads)
 
         self.seq_len = sent.size()[0]
         assert self.seq_len == 4, "The sequence length should be 4."
         
-        self.W_o = nn.Linear(512*self.num_heads,512) 
+        self.W_o = nn.Linear(512 * self.num_heads, 512)
         
         self.layer_norm = nn.LayerNorm(512)
         
         self.fc1 = nn.Linear(512, 1024)
         self.fc2 = nn.Linear(1024, 512)
         self.relu = nn.ReLU()
+
+        # Ensure all parameters require gradients
+        for param in self.parameters():
+            param.requires_grad = True
         
         self.d_model = 512
     
