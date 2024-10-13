@@ -5,3 +5,5 @@ exp/*
 __pycache__/decoder.cpython-310.pyc
 __pycache__/encoder.cpython-310.pyc
 __pycache__/imports.cpython-310.pyc
+__pycache__/decoder.cpython-311.pyc
+__pycache__/encoder.cpython-311.pyc
